@@ -2,30 +2,21 @@ package main
 
 import (
 	"flag"
-	"linkchecker/internal/crawler"
+	"linkchecker/config"
+	"linkchecker/internal/checker"
 	"log"
 	"net/url"
 	"time"
 )
 
-type Config struct {
-	URL           string
-	MaxDepth      int
-	Timeout       time.Duration
-	Workers       int
-	OutputFormat  string
-	Verbose       bool
-	SkipSSLVerify bool
-}
-
 // visited хранит уже просмотренные URL, чтобы не обходить их повторно.
 
 func main() {
-	URL := flag.String("URL", "https://leetcode.com/problemset/", "путь к .md файлу (обязательно)")
-	depth := flag.Int("output", 5, "путь для сохранения .html(по умолчанию stdout)")
+	URL := flag.String("URL", "https://practicum.yandex.ru/profile/go-developer-basic/", "путь к .md файлу (обязательно)")
+	depth := flag.Int("output", 10, "путь для сохранения .html(по умолчанию stdout)")
 	flag.Parse()
 
-	conf := Config{
+	conf := config.Config{
 		URL:      *URL,
 		MaxDepth: 10,
 		Timeout:  300 * time.Second,
@@ -36,6 +27,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("bad start URL: %v", err)
 	}
-	crawler.Crawl(root, root, *depth, conf.MaxDepth)
+	checker.Check(root, root, 0, *depth, conf)
 
 }

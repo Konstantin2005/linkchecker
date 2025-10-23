@@ -2,42 +2,26 @@ package crawler
 
 import (
 	"fmt"
+	"io"
+	"linkchecker/config"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"golang.org/x/net/html"
 )
 
-type CheckResult struct {
-	URL          string
-	StatusCode   int
-	Error        string
-	Depth        int
-	Referrer     string
-	ResponseTime time.Duration
-}
-
-type Summary struct {
-	TotalLinks   int
-	CheckedLinks int
-	Successful   int
-	Errors       int
-	ErrorByType  map[int]int
-	Duration     time.Duration
-}
-
 var visited = make(map[string]bool)
 
 // crawl обходит страницу u, извлекает внутренние ссылки и рекурсивно обходит их.
-func Crawl(u, root *url.URL, depth, maxDepth int) {
+
+func Crawl(u, root *url.URL, depth, maxDepth int, Sum config.Summary) config.Summary {
 	if depth > maxDepth {
-		return
+		return Sum
 	}
 	if visited[u.String()] {
-		return
+		return Sum
 	}
 	visited[u.String()] = true
 
@@ -46,27 +30,33 @@ func Crawl(u, root *url.URL, depth, maxDepth int) {
 	resp, err := http.Get(u.String())
 	if err != nil {
 		log.Printf("GET %s: %v", u, err)
-		return
+		return Sum
 	}
-	defer resp.Body.Close()
+	fmt.Println(resp.Status)
+	Sum.TotalLinks++
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(resp.Body)
 
 	// интересуют только HTML
 	ct := resp.Header.Get("Content-Type")
 	if !strings.HasPrefix(ct, "text/html") {
-		return
+		return Sum
 	}
 
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
 		log.Printf("parse %s: %v", u, err)
-		return
+		return Sum
 	}
 
 	for _, link := range extractLinks(doc, u) { // u как base для относительных
 		// внутренние = тот же host
-		if link.Host != root.Host {
-			continue
-		}
-		Crawl(link, root, depth+1, maxDepth)
+
+		Crawl(link, root, depth+1, maxDepth, Sum)
 	}
+	return Sum
 }
