@@ -5,20 +5,40 @@ import (
 	"io"
 	"linkchecker/config"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"golang.org/x/net/html"
 )
 
 var visited = make(map[string]bool)
 
-var Sum config.Summary
+var HttpClient *http.Client
+
+func init() {
+	HttpClient = &http.Client{
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			MaxIdleConnsPerHost:   10,
+			MaxConnsPerHost:       15,
+		},
+		Timeout: 60 * time.Second,
+	}
+}
 
 // crawl обходит страницу u, извлекает внутренние ссылки и рекурсивно обходит их.
 
-func Crawl(u, root *url.URL, depth, maxDepth int) {
+func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 	if depth > maxDepth {
 		return
 	}
@@ -29,8 +49,9 @@ func Crawl(u, root *url.URL, depth, maxDepth int) {
 
 	fmt.Printf("%s (depth %d)\n", u, depth)
 
-	resp, err := http.Get(u.String())
+	resp, err := HttpClient.Get(u.String())
 	Sum.TotalLinks++
+	Sum.ErrorByType[resp.StatusCode]++
 
 	if err != nil {
 		log.Printf("GET %s: %v", u, err)
@@ -61,7 +82,7 @@ func Crawl(u, root *url.URL, depth, maxDepth int) {
 		if link.Host != root.Host {
 			continue
 		}
-		Crawl(link, root, depth+1, maxDepth)
+		Crawl(link, root, depth+1, maxDepth, Sum)
 	}
 	return
 }

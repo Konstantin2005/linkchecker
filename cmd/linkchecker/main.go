@@ -13,7 +13,7 @@ import (
 
 func main() {
 	URL := flag.String("URL", "https://www.google.com/", "путь к .md файлу (обязательно)")
-	depth := flag.Int("output", 10, "путь для сохранения .html(по умолчанию stdout)")
+	depth := flag.Int("output", 4, "путь для сохранения .html(по умолчанию stdout)")
 	flag.Parse()
 
 	conf := config.Config{
