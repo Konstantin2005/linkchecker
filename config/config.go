@@ -17,6 +17,7 @@ type CheckResult struct {
 	URL          string
 	StatusCode   int
 	Error        string
+	Workers      int
 	Depth        int
 	Referrer     string
 	ResponseTime time.Duration

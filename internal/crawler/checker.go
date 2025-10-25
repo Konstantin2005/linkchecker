@@ -3,6 +3,7 @@ package crawler
 import (
 	"fmt"
 	"linkchecker/config"
+	"linkchecker/internal/output"
 	"net/url"
 )
 
@@ -20,4 +21,6 @@ func Check(u, root *url.URL, depth, maxDepth int, conf config.Config) {
 
 	fmt.Println(Sum.TotalLinks)
 	fmt.Println(Sum.ErrorByType)
+	f := output.NewFormatter()
+	f.PrintSummary(Sum)
 }

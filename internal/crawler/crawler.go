@@ -61,7 +61,7 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-
+			panic(err)
 		}
 	}(resp.Body)
 
