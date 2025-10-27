@@ -14,7 +14,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-var visited = make(map[string]bool)
+var Visited = make(map[string]bool)
 
 var HttpClient *http.Client
 
@@ -42,22 +42,22 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 	if depth > maxDepth {
 		return
 	}
-	if visited[u.String()] {
+	if Visited[u.String()] {
 		return
 	}
-	visited[u.String()] = true
-
-	fmt.Printf("%s (depth %d)\n", u, depth)
+	Visited[u.String()] = true
 
 	resp, err := HttpClient.Get(u.String())
-	Sum.TotalLinks++
 	Sum.ErrorByType[resp.StatusCode]++
+
+	if resp.StatusCode != 200 {
+
+	}
 
 	if err != nil {
 		log.Printf("GET %s: %v", u, err)
 		return
 	}
-	fmt.Println(resp.Status)
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
@@ -82,7 +82,9 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 		if link.Host != root.Host {
 			continue
 		}
+		fmt.Printf("%s (depth %d)\n", link, depth)
 		Crawl(link, root, depth+1, maxDepth, Sum)
 	}
+	Sum.CheckedLinks = len(Visited)
 	return
 }

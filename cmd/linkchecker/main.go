@@ -12,15 +12,15 @@ import (
 // visited хранит уже просмотренные URL, чтобы не обходить их повторно.
 
 func main() {
-	URL := flag.String("URL", "https://www.google.com/", "путь к .md файлу (обязательно)")
-	depth := flag.Int("output", 3, "путь для сохранения .html(по умолчанию stdout)")
+	URL := flag.String("URL", "https://github.com/Konstantin2005/linkchecker/blob/main/go.mod", "путь к .md файлу (обязательно)")
+	depth := flag.Int("output", 7, "путь для сохранения .html(по умолчанию stdout)")
 	flag.Parse()
 
 	conf := config.Config{
 		URL:      *URL,
-		MaxDepth: 10,
-		Timeout:  300 * time.Second,
-		Workers:  5000,
+		MaxDepth: *depth,
+		Timeout:  5 * time.Second,
+		Workers:  1,
 	}
 
 	root, err := url.Parse(conf.URL)

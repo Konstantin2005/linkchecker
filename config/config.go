@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+type Problem struct {
+	url     string
+	fromURL string
+}
+
 type Config struct {
 	URL           string
 	MaxDepth      int
