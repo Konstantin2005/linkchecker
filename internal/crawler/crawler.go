@@ -1,7 +1,6 @@
 package crawler
 
 import (
-	"fmt"
 	"io"
 	"linkchecker/config"
 	"log"
@@ -50,10 +49,6 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 	resp, err := HttpClient.Get(u.String())
 	Sum.ErrorByType[resp.StatusCode]++
 
-	if resp.StatusCode != 200 {
-
-	}
-
 	if err != nil {
 		log.Printf("GET %s: %v", u, err)
 		return
@@ -82,7 +77,7 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 		if link.Host != root.Host {
 			continue
 		}
-		fmt.Printf("%s (depth %d)\n", link, depth)
+		//fmt.Printf("%s (depth %d)\n", link, depth)
 		Crawl(link, root, depth+1, maxDepth, Sum)
 	}
 	Sum.CheckedLinks = len(Visited)
