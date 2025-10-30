@@ -27,7 +27,7 @@ func main() {
 	depth := flag.Int("depth", 2, "Глубина обхода")
 	timeout := flag.Int("timeout", 10, "Таймаут запроса в секундах")
 	workers := flag.Int("workers", 1, "Количесвто Горутин")
-	OutputFormat := flag.String("output", "text", "Как выводить")
+	OutputFormat := flag.String("output", "json", "Как выводить")
 
 	help := flag.Bool("help", false, "показать справку")
 	flag.Parse()
@@ -55,10 +55,8 @@ func main() {
 
 	crawler.Crawl(root, root, 1, *depth, Sum)
 	done <- true
-	f := output.NewFormatter()
-
-	f.PrintResult(conf)
 	Sum.Duration = time.Since(start)
-	f.PrintSummary(Sum)
+
+	output.MainFormate(conf, Sum)
 
 }
