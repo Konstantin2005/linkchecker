@@ -18,12 +18,14 @@ func MainFormate(config config.Config, Sum *config.Summary) {
 
 		fmt.Println("json")
 	case "csv":
+
 		fmt.Println("csv")
 	case "text":
 		f := NewFormatter()
 
 		f.PrintResult(config)
 		f.PrintSummary(Sum)
+		f.PrintError(Sum.ProblemLinks)
 
 	}
 

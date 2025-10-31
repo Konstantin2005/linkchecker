@@ -13,7 +13,8 @@ import (
 
 func NewSummary() *config.Summary {
 	return &config.Summary{
-		ErrorByType: make(map[int]int),
+		ErrorByType:  make(map[int]int),
+		ProblemLinks: make(map[string]config.CheckResult),
 	}
 }
 
@@ -23,11 +24,11 @@ func main() {
 	done := make(chan bool) // чтобы анимация была
 	start := time.Now()     // таймер запустить
 
-	URL := flag.String("URL", "https://github.com/Konstantin2005/linkchecker/blob/main/go.mod", "Сслыка для обхода")
-	depth := flag.Int("depth", 2, "Глубина обхода")
+	URL := flag.String("URL", "https://stepik.org/catalog", "Сслыка для обхода")
+	depth := flag.Int("depth", 10, "Глубина обхода")
 	timeout := flag.Int("timeout", 10, "Таймаут запроса в секундах")
 	workers := flag.Int("workers", 1, "Количесвто Горутин")
-	OutputFormat := flag.String("output", "json", "Как выводить")
+	OutputFormat := flag.String("output", "text", "Как выводить")
 
 	help := flag.Bool("help", false, "показать справку")
 	flag.Parse()

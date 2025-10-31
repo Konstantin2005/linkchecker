@@ -25,3 +25,13 @@ func Loading(done chan bool) {
 		fmt.Print("\r")
 	}()
 }
+
+func SumError(arr map[int]int) int {
+	sum := 0
+	for k, v := range arr {
+		if k > 299 {
+			sum += v
+		}
+	}
+	return sum
+}

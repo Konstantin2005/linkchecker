@@ -1,6 +1,7 @@
 package config
 
 import (
+	"net/url"
 	"time"
 )
 
@@ -19,20 +20,20 @@ type Config struct {
 	SkipSSLVerify bool          `json:"SkipSSLVerify"`
 }
 type Summary struct {
-	TotalLinks   int           `json:"TotalLinks"`
-	CheckedLinks int           `json:"CheckedLinks"`
-	Successful   int           `json:"Successful"`
-	Errors       int           `json:"Errors"`
-	ErrorByType  map[int]int   `json:"ErrorByType"`
-	Duration     time.Duration `json:"Duration"`
+	TotalLinks   int                    `json:"TotalLinks"`
+	CheckedLinks int                    `json:"CheckedLinks"`
+	Successful   int                    `json:"Successful"`
+	Errors       int                    `json:"Errors"`
+	Duration     time.Duration          `json:"Duration"`
+	ErrorByType  map[int]int            `json:"ErrorByType"`
+	ProblemLinks map[string]CheckResult `json:"ProblemLinks"`
 }
 
 type CheckResult struct {
-	URL          string        `json:"URL"`
 	StatusCode   int           `json:"StatusCode"`
-	Error        string        `json:"Error"`
+	Error        error         `json:"Error"`
 	Workers      int           `json:"Workers"`
 	Depth        int           `json:"Depth"`
-	Referrer     string        `json:"Referrer"`
+	Referrer     *url.URL      `json:"Referrer"`
 	ResponseTime time.Duration `json:"ResponseTime"`
 }

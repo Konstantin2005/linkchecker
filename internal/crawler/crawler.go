@@ -49,8 +49,17 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 	resp, err := HttpClient.Get(u.String())
 	Sum.ErrorByType[resp.StatusCode]++
 
+	if resp.StatusCode > 299 {
+		Sum.ProblemLinks[u.String()] = config.CheckResult{
+			StatusCode:   resp.StatusCode,
+			Error:        err,
+			Workers:      1,
+			Depth:        depth,
+			Referrer:     root,
+			ResponseTime: time.Duration(resp.ContentLength),
+		}
+	}
 	if err != nil {
-		log.Printf("GET %s: %v", u, err)
 		return
 	}
 	defer func(Body io.ReadCloser) {
@@ -77,7 +86,6 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 		if link.Host != root.Host {
 			continue
 		}
-		//fmt.Printf("%s (depth %d)\n", link, depth)
 		Crawl(link, root, depth+1, maxDepth, Sum)
 	}
 	Sum.CheckedLinks = len(Visited)
