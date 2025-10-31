@@ -20,8 +20,8 @@ func NewSummary() *config.Summary {
 // visited хранит уже просмотренные URL, чтобы не обходить их повторно.
 
 func main() {
-	done := make(chan bool)
-	start := time.Now()
+	done := make(chan bool) // чтобы анимация была
+	start := time.Now()     // таймер запустить
 
 	URL := flag.String("URL", "https://github.com/Konstantin2005/linkchecker/blob/main/go.mod", "Сслыка для обхода")
 	depth := flag.Int("depth", 2, "Глубина обхода")
@@ -38,11 +38,13 @@ func main() {
 	}
 
 	conf := config.Config{
-		URL:          *URL,
-		MaxDepth:     *depth,
-		Timeout:      time.Duration(*timeout),
-		Workers:      *workers,
-		OutputFormat: *OutputFormat,
+		URL:           *URL,
+		MaxDepth:      *depth,
+		Timeout:       time.Duration(*timeout),
+		Workers:       *workers,
+		OutputFormat:  *OutputFormat,
+		Verbose:       false,
+		SkipSSLVerify: false,
 	}
 
 	go pkg.Loading(done)

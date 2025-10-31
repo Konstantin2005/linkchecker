@@ -33,6 +33,7 @@ func (t textFormatter) PrintSummary(r *config.Summary) {
 func (t textFormatter) PrintError(url, error string) {
 
 }
+
 func NewFormatter() Formatter {
 	return &textFormatter{}
 }

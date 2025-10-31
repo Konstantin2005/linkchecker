@@ -10,29 +10,29 @@ type Problem struct {
 }
 
 type Config struct {
-	URL           string
-	MaxDepth      int
-	Timeout       time.Duration
-	Workers       int
-	OutputFormat  string
-	Verbose       bool
-	SkipSSLVerify bool
+	URL           string        `json:"URL"`
+	MaxDepth      int           `json:"MaxDepth"`
+	Timeout       time.Duration `json:"Timeout"`
+	Workers       int           `json:"Workers"`
+	OutputFormat  string        `json:"OutputFormat"`
+	Verbose       bool          `json:"Verbose"`
+	SkipSSLVerify bool          `json:"SkipSSLVerify"`
 }
-type CheckResult struct {
-	URL          string
-	StatusCode   int
-	Error        string
-	Workers      int
-	Depth        int
-	Referrer     string
-	ResponseTime time.Duration
+type Summary struct {
+	TotalLinks   int           `json:"TotalLinks"`
+	CheckedLinks int           `json:"CheckedLinks"`
+	Successful   int           `json:"Successful"`
+	Errors       int           `json:"Errors"`
+	ErrorByType  map[int]int   `json:"ErrorByType"`
+	Duration     time.Duration `json:"Duration"`
 }
 
-type Summary struct {
-	TotalLinks   int
-	CheckedLinks int
-	Successful   int
-	Errors       int
-	ErrorByType  map[int]int
-	Duration     time.Duration
+type CheckResult struct {
+	URL          string        `json:"URL"`
+	StatusCode   int           `json:"StatusCode"`
+	Error        string        `json:"Error"`
+	Workers      int           `json:"Workers"`
+	Depth        int           `json:"Depth"`
+	Referrer     string        `json:"Referrer"`
+	ResponseTime time.Duration `json:"ResponseTime"`
 }
