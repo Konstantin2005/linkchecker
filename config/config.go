@@ -30,6 +30,7 @@ type Summary struct {
 }
 
 type CheckResult struct {
+	URL          string        `json:"URL"`
 	StatusCode   int           `json:"StatusCode"`
 	Error        error         `json:"Error"`
 	Workers      int           `json:"Workers"`

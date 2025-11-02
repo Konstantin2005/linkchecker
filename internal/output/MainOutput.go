@@ -15,8 +15,6 @@ func MainFormate(config config.Config, Sum *config.Summary) {
 		j := NewJSONFormatter(os.Stdout)
 		j.PrintResultJson(config)
 		j.PrintSummaryJson(Sum)
-
-		fmt.Println("json")
 	case "csv":
 
 		fmt.Println("csv")

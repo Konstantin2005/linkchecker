@@ -24,7 +24,7 @@ func main() {
 	done := make(chan bool) // чтобы анимация была
 	start := time.Now()     // таймер запустить
 
-	URL := flag.String("URL", "https://stepik.org/catalog", "Сслыка для обхода")
+	URL := flag.String("URL", "https://github.com/Konstantin2005", "Сслыка для обхода")
 	depth := flag.Int("depth", 10, "Глубина обхода")
 	timeout := flag.Int("timeout", 10, "Таймаут запроса в секундах")
 	workers := flag.Int("workers", 1, "Количесвто Горутин")

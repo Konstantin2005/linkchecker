@@ -13,6 +13,11 @@ import (
 	"golang.org/x/net/html"
 )
 
+const (
+	StatusNetError  = -1 // любая сетевая / TLS / DNS ошибка
+	StatusHTMLError = -2 // не HTML,
+)
+
 var Visited = make(map[string]bool)
 
 var HttpClient *http.Client
@@ -38,30 +43,28 @@ func init() {
 // crawl обходит страницу u, извлекает внутренние ссылки и рекурсивно обходит их.
 
 func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
-	if depth > maxDepth {
+	if depth > maxDepth || Visited[u.String()] {
 		return
 	}
-	if Visited[u.String()] {
-		return
-	}
-	Visited[u.String()] = true
+	Visited[u.String()] = true // помечаем проверенные сылки
 
+	start := time.Now()
 	resp, err := HttpClient.Get(u.String())
-	Sum.ErrorByType[resp.StatusCode]++
+	elapsed := time.Since(start)
 
-	if resp.StatusCode > 299 {
-		Sum.ProblemLinks[u.String()] = config.CheckResult{
-			StatusCode:   resp.StatusCode,
-			Error:        err,
-			Workers:      1,
-			Depth:        depth,
-			Referrer:     root,
-			ResponseTime: time.Duration(resp.ContentLength),
-		}
-	}
-	if err != nil {
+	if err != nil { // сетевые, TLS, DNS, time-out ошибки
+		AddProblem(Sum, u.String(), depth, root, StatusNetError, err, elapsed)
 		return
 	}
+	status := resp.StatusCode
+
+	if status == 200 {
+		Sum.ErrorByType[status]++
+	}
+	if status >= 300 {
+		AddProblem(Sum, u.String(), depth, root, resp.StatusCode, nil, elapsed)
+	}
+
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
@@ -83,11 +86,24 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 
 	for _, link := range extractLinks(doc, u) { // u как base для относительных
 		// внутренние = тот же host
-		if link.Host != root.Host {
-			continue
+		if link.Host == root.Host {
+			Crawl(link, root, depth+1, maxDepth, Sum)
 		}
-		Crawl(link, root, depth+1, maxDepth, Sum)
 	}
 	Sum.CheckedLinks = len(Visited)
 	return
+}
+
+func AddProblem(s *config.Summary, u string, depth int, ref *url.URL,
+	code int, err error, dur time.Duration) {
+
+	s.ErrorByType[code]++
+	s.ProblemLinks[u] = config.CheckResult{
+		StatusCode:   code,
+		Error:        err,
+		Workers:      1,
+		Depth:        depth,
+		Referrer:     ref,
+		ResponseTime: dur,
+	}
 }
