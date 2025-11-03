@@ -25,10 +25,10 @@ func main() {
 	start := time.Now()     // таймер запустить
 
 	URL := flag.String("URL", "https://github.com/Konstantin2005", "Сслыка для обхода")
-	depth := flag.Int("depth", 10, "Глубина обхода")
+	depth := flag.Int("depth", 5, "Глубина обхода")
 	timeout := flag.Int("timeout", 10, "Таймаут запроса в секундах")
 	workers := flag.Int("workers", 1, "Количесвто Горутин")
-	OutputFormat := flag.String("output", "text", "Как выводить")
+	OutputFormat := flag.String("output", "json", "Как выводить")
 
 	help := flag.Bool("help", false, "показать справку")
 	flag.Parse()

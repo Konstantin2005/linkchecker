@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-type Problem struct {
-	url     string
-	fromURL string
-}
-
 type Config struct {
 	URL           string        `json:"URL"`
 	MaxDepth      int           `json:"MaxDepth"`
@@ -33,8 +28,7 @@ type CheckResult struct {
 	URL          string        `json:"URL"`
 	StatusCode   int           `json:"StatusCode"`
 	Error        error         `json:"Error"`
-	Workers      int           `json:"Workers"`
-	Depth        int           `json:"Depth"`
 	Referrer     *url.URL      `json:"Referrer"`
+	Depth        int           `json:"Depth"`
 	ResponseTime time.Duration `json:"ResponseTime"`
 }

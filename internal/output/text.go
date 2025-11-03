@@ -24,9 +24,9 @@ func (t textFormatter) PrintResult(r config.Config) {
 func (t textFormatter) PrintSummary(r *config.Summary) {
 
 	fmt.Println("📊 Statistics:")
-	fmt.Printf("Total links found: %d\n", r.CheckedLinks)
+	fmt.Printf("Total links found: %d\n", r.TotalLinks)
 	fmt.Printf("Successfully checked: %d\n", r.CheckedLinks)
-	fmt.Printf("Successful (200): %d\n", r.ErrorByType[200])
+	fmt.Printf("Successful (200): %d\n", r.Successful)
 	fmt.Printf("Errors: %d\n\n", pkg.SumError(r.ErrorByType))
 
 	fmt.Printf("⏱️  Duration: %.1fs\n\n", r.Duration.Seconds())

@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 	"time"
 
@@ -46,7 +47,9 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 	if depth > maxDepth || Visited[u.String()] {
 		return
 	}
+
 	Visited[u.String()] = true // помечаем проверенные сылки
+	Sum.TotalLinks++
 
 	start := time.Now()
 	resp, err := HttpClient.Get(u.String())
@@ -59,7 +62,7 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 	status := resp.StatusCode
 
 	if status == 200 {
-		Sum.ErrorByType[status]++
+		Sum.Successful++
 	}
 	if status >= 300 {
 		AddProblem(Sum, u.String(), depth, root, resp.StatusCode, nil, elapsed)
@@ -94,16 +97,20 @@ func Crawl(u, root *url.URL, depth, maxDepth int, Sum *config.Summary) {
 	return
 }
 
-func AddProblem(s *config.Summary, u string, depth int, ref *url.URL,
+func AddProblem(s *config.Summary, str string, depth int, ref *url.URL,
 	code int, err error, dur time.Duration) {
-
 	s.ErrorByType[code]++
-	s.ProblemLinks[u] = config.CheckResult{
+
+	u, _ := url.Parse(str)
+	u.Path = path.Dir(u.Path)
+	u.RawQuery, u.Fragment = "", ""
+
+	s.ProblemLinks[str] = config.CheckResult{
+		URL:          str,
 		StatusCode:   code,
 		Error:        err,
-		Workers:      1,
 		Depth:        depth,
-		Referrer:     ref,
+		Referrer:     u,
 		ResponseTime: dur,
 	}
 }
