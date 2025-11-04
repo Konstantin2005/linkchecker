@@ -1,9 +1,9 @@
 package output
 
 import (
-	"fmt"
-	"linkchecker/config"
-	"os"
+	"fmt"                //nolint:gci
+	"linkchecker/config" //nolint:gci
+	"os"                 //nolint:gci
 )
 
 func MainFormate(config config.Config, Sum *config.Summary) {
@@ -15,13 +15,7 @@ func MainFormate(config config.Config, Sum *config.Summary) {
 		j := NewJSONFormatter(os.Stdout)
 		j.PrintResultJson(config)
 		j.PrintSummaryJson(Sum)
-		j.PrintErrorJson(Sum.ProblemLinks)
-
-		f := NewFormatter()
-
-		f.PrintResult(config)
-		f.PrintSummary(Sum)
-		f.PrintError(Sum.ProblemLinks)
+		j.PrintErrorJson(Sum.ProblemLinks, Sum.Duration)
 
 		//c := NewFormatterCsv()
 		//
@@ -32,7 +26,11 @@ func MainFormate(config config.Config, Sum *config.Summary) {
 
 		fmt.Println("csv")
 	case "text":
+		f := NewFormatter()
 
+		f.PrintResult(config)
+		f.PrintSummary(Sum)
+		f.PrintError(Sum.ProblemLinks)
 	}
 
 }

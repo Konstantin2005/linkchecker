@@ -5,12 +5,13 @@ import (
 	"linkchecker/config"
 	"linkchecker/pkg"
 	"os"
+	"time"
 )
 
 type FormatterJson interface {
 	PrintResultJson(result config.Config)
 	PrintSummaryJson(summary *config.Summary)
-	PrintErrorJson(str map[string]config.CheckResult)
+	PrintErrorJson(str map[string]config.CheckResult, duration time.Duration)
 }
 
 // JSONFormatter записывает всё строками JSON.
@@ -41,15 +42,34 @@ func (j *JSONFormatter) PrintSummaryJson(s *config.Summary) {
 	})
 }
 
-func (j *JSONFormatter) PrintErrorJson(str map[string]config.CheckResult) {
-	data := map[string]any{
-		"problem_links": []any{
-			map[string]any{
-				"url": str,
-			},
-		},
+func (j *JSONFormatter) PrintErrorJson(problems map[string]config.CheckResult, dur time.Duration) {
+
+	// объект «ссылка + результат»
+	type linkWithResult struct {
+		URL string `json:"url"`
+		config.CheckResult
 	}
-	json.NewEncoder(os.Stdout).Encode(data)
+
+	// корневой объект
+	out := struct {
+		ProblemLinks []linkWithResult `json:"problem_links"`
+		Duration     string           `json:"duration"`
+	}{
+		Duration: dur.String(),
+	}
+
+	// заполняем слайс
+	out.ProblemLinks = make([]linkWithResult, 0, len(problems))
+	for url, res := range problems {
+		out.ProblemLinks = append(out.ProblemLinks, linkWithResult{
+			URL:         url,
+			CheckResult: res,
+		})
+	}
+
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	j.enc.Encode(out)
 }
 
 func NewJSONFormatter(file *os.File) *JSONFormatter {
